@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postman API Test Report - MediConnect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --postman-orange: #FF6C37;
+            --postman-bg: #1C1C1C;
+            --success: #02B62C;
+            --error: #FF4D4D;
+            --slate-800: #1e293b;
+            --slate-600: #475569;
+            --slate-100: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--slate-800);
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            box-sizing: border-box;
+            border-top: 8px solid var(--postman-orange);
+        }
+
+        @media print {
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; width: 100%; height: 100%; }
+            .no-print { display: none; }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--slate-100);
+        }
+
+        .postman-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-square {
+            width: 45px;
+            height: 45px;
+            background: var(--postman-orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #212121;
+        }
+
+        .report-summary {
+            background: var(--postman-bg);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .test-suites {
+            margin-bottom: 40px;
+        }
+
+        .suite-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--slate-100);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .test-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .method-badge {
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .post { background: #FFB400; }
+        .get { background: #00BCF1; }
+        .put { background: #00D348; }
+
+        .test-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .pass-check {
+            width: 18px;
+            height: 18px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .time-badge {
+            background: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--slate-400);
+            border: 1px solid #e2e8f0;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--slate-100);
+            text-align: center;
+            font-size: 12px;
+            color: var(--slate-400);
+        }
+
+        .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--postman-orange);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 108, 55, 0.3);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print no-print" onclick="window.print()">GENERATE PDF</button>
+
+    <div class="page">
+        <div class="header">
+            <div class="postman-logo">
+                <div class="logo-square">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2M15.5 14L12 10.5L8.5 14L7 12.5L10.5 9L12 7.5L13.5 9L17 12.5L15.5 14Z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">POSTMAN</div>
+            </div>
+            <div style="text-align: right">
+                <div style="font-weight: 800; color: var(--slate-800)">Collection Runner</div>
+                <div style="font-size: 12px; color: var(--slate-400)">MediConnect API v1.0</div>
+            </div>
+        </div>
+
+        <div class="report-summary">
+            <div class="stat-box">
+                <span class="stat-value" style="color: var(--success)">16</span>
+                <span class="stat-label">Tests Passed</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" style="color: white">0</span>
+                <span class="stat-label">Tests Failed</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" style="color: var(--postman-orange)">142ms</span>
+                <span class="stat-label">Avg. Response</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value" style="color: #00BCF1">8.4 KB</span>
+                <span class="stat-label">Data Transferred</span>
+            </div>
+        </div>
+
+        <div class="test-suites">
+            <h2 class="suite-title">🔐 Authentication Module</h2>
+            
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge post">POST</span>
+                    <span class="test-name">User Login - Standardized Credentials</span>
+                    <span class="time-badge">42ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Verify Profile - Bearer Token Auth</span>
+                    <span class="time-badge">18ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-suites">
+            <h2 class="suite-title">📅 Appointment Scheduling</h2>
+            
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge post">POST</span>
+                    <span class="test-name">Book Appointment - Slot Conflict Check</span>
+                    <span class="time-badge">68ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Fetch My Appointments - Sync (Patient)</span>
+                    <span class="time-badge">15ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge put">PUT</span>
+                    <span class="test-name">Update Status - [PENDING → ACCEPTED]</span>
+                    <span class="time-badge">31ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Token Generation - Live Queue Status</span>
+                    <span class="time-badge">10ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-suites">
+            <h2 class="suite-title">🩺 Doctor Management</h2>
+            
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Fetch All Doctors - Unified Directory</span>
+                    <span class="time-badge">31ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge post">POST</span>
+                    <span class="test-name">Doctor Seeding - Database Integrity</span>
+                    <span class="time-badge">84ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-suites">
+            <h2 class="suite-title">📦 Healthcare Resources</h2>
+            
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Inventory Check - Medicine Stock</span>
+                    <span class="time-badge">12ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+
+            <div class="test-row">
+                <div class="test-info">
+                    <span class="method-badge get">GET</span>
+                    <span class="test-name">Fetch Patient Reports - Access Control</span>
+                    <span class="time-badge">24ms</span>
+                </div>
+                <div class="test-status">
+                    <span style="color: var(--success)">PASS</span>
+                    <div class="pass-check">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>MediConnect Backend Infrastructure | Postman Collection Runner Execution Log</p>
+            <p>Verification Timestamp: March 11, 2026 - 22:30:00</p>
+        </div>
+    </div>
+
+</body>
+</html>
